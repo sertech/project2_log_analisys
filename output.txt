@@ -1,0 +1,54 @@
+'''  ################ TODO #########################
+1. What are the most popular three articles of all time? Which articles have been accessed the most? Present this information as a sorted list with the most popular article at the top.
+Example:
+
+# "Princess Shellfish Marries Prince Handsome" — 1201 views
+# "Baltimore Ravens Defeat Rhode Island Shoggoths" — 915 views
+# "Political Scandal Ends In Political Scandal" — 553 views
+
+news=> select articles.title, count(log.status) as views from articles,log where log.path like ('%'||articles.slug) and log.status like '%200 OK' group by articles.title order by views DESC limit 3;
+              title               | views
+----------------------------------+--------
+ Candidate is jerk, alleges rival | 338647
+ Bears love berries, alleges bear | 253801
+ Bad things gone, say good people | 170098
+(3 rows)
+
+news=> select articles.slug, count(log.status) as views from articles,log where log.path like ('%'||articles.slug) and log.status like '%200 OK' group by articles.slug order by views DESC limit 3;
+        slug        | views
+--------------------+--------
+ candidate-is-jerk  | 338647
+ bears-love-berries | 253801
+ bad-things-gone    | 170098
+(3 rows)
+
+2. Who are the most popular article authors of all time? That is, when you sum up all of the articles each author has written, which authors get the most page views? Present this as a sorted list with the most popular author at the top.
+Example:
+
+Ursula La Multa — 2304 views
+Rudolf von Treppenwitz — 1985 views
+Markoff Chaney — 1723 views
+Anonymous Contributor — 1023 views
+
+news=> select authors.name, count(log.status) as views from authors,log,articles where authors.id = articles.author and log.path like ('%'||articles.slug) and log.status like '%200 OK' group by authors.name order by views desc;
+          name          | views
+------------------------+--------
+ Ursula La Multa        | 507594
+ Rudolf von Treppenwitz | 423457
+ Anonymous Contributor  | 170098
+ Markoff Chaney         |  84557
+(4 rows)
+
+3. On which days did more than 1% of requests lead to errors? The log table includes a column status that indicates the HTTP status code that the news site sent to the user's browser. (Refer back to this lesson if you want to review the idea of HTTP status codes.)
+Example:
+
+July 29, 2016 — 2.5% errors
+
+news=> select day as dayz,errors as errorsz from (select time::DATE as day, sum(case when status like '404 NOT FOUND' then 1 else 0 end)*100.0/count(status) as errors from log group by time::DATE order by errors desc) as derivedtable where errors between 1 and 100;
+
+    dayz    |      errorsz
+------------+--------------------
+ 2016-07-17 | 2.2626862468027260
+(1 row)
+
+'''
