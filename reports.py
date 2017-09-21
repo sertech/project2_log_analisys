@@ -1,7 +1,8 @@
+#! /usr/bin/env python3
+
 import psycopg2
 
-DBNAME = "news"
-myConnection = psycopg2.connect(database=DBNAME)
+myConnection = psycopg2.connect(database="news")
 
 
 def question_ONE(a_connection):
@@ -11,9 +12,11 @@ def question_ONE(a_connection):
             and log.status like '%200 OK' group by articles.title \
             order by views DESC limit 3"
     cursor.execute(query)
-    result = cursor.fetchall()
+    print("#"*70)
     print("What are the most popular three articles of all time?")
-    print result
+    for (title, views) in cursor.fetchall():
+        print("    {} - {} views".format(title, views))
+    print("#"*70)
 
 
 def question_TWO(a_connection):
@@ -24,23 +27,26 @@ def question_TWO(a_connection):
             log.status like '%200 OK' group by authors.name \
             order by views desc"
     cursor.execute(query)
-    result = cursor.fetchall()
+    print("#"*70)
     print("Who are the most popular article authors of all time?")
-    print result
+    for (name, views) in cursor.fetchall():
+        print("    {} - {} views".format(name, views))
+    print("#"*70)
 
 
 def question_THREE(a_connection):
     cursor = a_connection.cursor()
     query = "select day as dayz,errors as errorsz \
             from (select time::DATE as day, sum(case when status like \
-            '404 NOT FOUND' then else 0 end)*100.0/count(status) as errors \
+            '404 NOT FOUND' then 1 else 0 end)*100.0/count(status) as errors \
             from log group by time::DATE order by errors desc) \
             as derivedtable where errors between 1 and 100"
-
     cursor.execute(query)
-    result = cursor.fetchall()
+    print("#"*70)
     print("On which days did more than 1% of requests lead to errors?")
-    print result
+    for (day, errorsz) in cursor.fetchall():
+        print("    {} - {:10.2f}% errors".format(day, errorsz))
+    print("#"*70)
 
 
 question_ONE(myConnection)

@@ -79,3 +79,12 @@ import pgdb
 myConnection = pgdb.connect( host=hostname, user=username, password=password, database=database )
 doQuery( myConnection )
 myConnection.close()
+
+popular_articles = '''
+SQL STATEMENT TO RETRIEVE MOST POPULAR ARTICLES
+'''
+c.execute(popular_articles)
+print("Most popular articles:")
+for (title, count) in c.fetchall():
+    print("    {} - {} views".format(title, count))
+print("-" * 70)
